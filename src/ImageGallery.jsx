@@ -1,9 +1,14 @@
-export default function ImageGallery({ imgs }) {
+import ImageGalleryItem from "./ImageGalleryItem";
+export default function ImageGallery({ imgs, clickOnGall }) {
   return (
-    <ul>
-      {imgs.map((img) => (
-        <li key={img.id}>
-          <img src={img.webformatURL} alt="some pic"></img>
+    <ul className="ImageGallery">
+      {imgs.map(({ id, webformatURL }) => (
+        <li key={id}>
+          <ImageGalleryItem
+            id={id}
+            url={webformatURL}
+            clickOnImg={clickOnGall}
+          />
         </li>
       ))}
     </ul>

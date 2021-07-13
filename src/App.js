@@ -1,65 +1,91 @@
-// import "./App.css";
-// import axios from "axios";
-import React, { Component } from "react";
-
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-
-// import ImageGalleryItem from "./ImageGalleryItem";
-
-import Searchbar from "./Comps/Searchbar";
+import React, { Component } from "react"; // import axios from "axios";
+import Loader from "react-loader-spinner"; // import { ToastContainer } from "react-toastify";
+import Searchbar from "./Comps/Searchbar"; // import "react-toastify/dist/ReactToastify.css";
 import ImageGallery from "./ImageGallery";
-// alert("www");
-import fetchPix from "./js/Api";
+import Modal from "./Modal";
 
-// import  Searchbar  from "./Comps/Searchbar";
+import fetchPix from "./js/Api";
+import Button from "./Button";
 
 export default class App extends Component {
   state = {
     query: null,
+    curPage: 1,
     imgs: [],
-    status: "idle",
+    modalImgId: null,
+    showM: false,
+    status: false,
   };
 
-  handleSubmit = (query) => this.setState({ query });
+  handleSubmit = async (query) => await this.setState({ query, curPage: 1 });
+
+  toggleModal = () => this.setState({ showM: !this.state.showM });
+
+  handleMore = async () =>
+    await this.setState(({ curPage }) => ({ curPage: curPage + 1 }));
+
+  handleTakeID = (e) => {
+    this.setState({ modalImgId: +e.target.id });
+    this.toggleModal();
+  };
 
   async componentDidUpdate(_, pState) {
-    console.log(pState.query, this.state.query);
-    if (pState.query !== this.state.query) {
-      // console.log("fetch!");
+    const { state } = this;
+    const { query, curPage } = state;
 
-      // https://pixabay.com/api/?image_type=photo&orientation=horizontal&q=что_искать&page=номер_страницы&per_page=12&key=21031732-6fee4eefe658f550324b0a29e
-      // const {data}=await axios.get(`https://pixabay.com/api/?image_type=photo&orientation=horizontal&q=${this.state.query}$&page=1&per_page=12&key=21031732-6fee4eefe658f550324b0a29e`)
-      // const resp = await fetchPix(this.state.query, 1)
-      // .then(imgs => {
+    if (pState.query !== query) {
       this.setState({
-        imgs: await fetchPix(this.state.query, 1),
+        status: true,
+        imgs: [...(await fetchPix(query, curPage))],
       });
-      // // });
-      // console.log("hello", this.state.imgs[0]);
-      // console.log("hello data.hits:", this.state.imgs[0]);
+      this.setState({ status: false });
     }
+
+    if (pState.curPage !== curPage) {
+      this.setState({
+        status: true,
+        imgs: [...(await fetchPix(query, curPage))],
+      });
+      this.setState({ status: false });
+    }
+
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: "smooth",
+    }); // console.log("finall cDU");
   }
 
   render() {
     // const notify = () => toast("Wow so easy!");
-    const { imgs } = this.state;
-    const showImgs = imgs.length > 0;
+    const { state, handleTakeID, handleMore, toggleModal } = this;
+    const { imgs, status, showM, modalImgId } = state;
+    const toSearch = (id) => {
+      return imgs[imgs.map((el) => el.id).indexOf(id)].largeImageURL;
+    }; // return big img url by id (take from DOM by click on screen)
+
     return (
       <div className="App">
-        {/* <button onClick={notify}>Notify!</button> */}
-        <Searchbar onSubmitGo={this.handleSubmit} />
-        {showImgs && <ImageGallery imgs={imgs} />}
-        <ToastContainer />
-
-        {/* <img src={} width='320' alt='img'></img> */}
-        {/* <Searchbar /> */}
-        {/* {r()} */}
-        {/* <ImageGalleryItem /> */}
+        {status && (
+          <Loader
+            className="Loader"
+            type="Watch"
+            // type="ThreeDots" color="red" color="#00BFFF" height={100} width={100} timeout={3000} 303f9f
+            // Audio Watch Triangle BallTriangle Bars Circles Grid Hearts Oval Puff Rings TailSpin ThreeDots RevolvingDot MutatingDots
+          />
+        )}
+        {/* <button onClick={notify}>Notify!</button>  */}
+        <Searchbar onSubmitDo={(query) => this.setState({ query })} />
+        {!status && imgs.length > 0 && (
+          <>
+            <ImageGallery imgs={imgs} clickOnGall={handleTakeID} />
+            <Button onClick={handleMore} />
+          </>
+        )}
+        {showM && (
+          <Modal urlBigImg={toSearch(modalImgId)} onClose={toggleModal} />
+        )}{" "}
+        {/* <ToastContainer /> */}
       </div>
     );
   }
-}
-
-// `<Searchbar>`, `<ImageGallery>`, `<ImageGalleryItem>`,
-// `<Loader>`, `<Button>` ,`<Modal>`
+} // <Searchbar> <ImageGallery> <ImageGalleryItem> <Loader> <Button> <Modal>
