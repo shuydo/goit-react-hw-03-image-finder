@@ -1,11 +1,12 @@
 import React, { Component } from "react"; // import axios from "axios";
 import Loader from "react-loader-spinner"; // import { ToastContainer } from "react-toastify";
-import Searchbar from "./Comps/Searchbar"; // import "react-toastify/dist/ReactToastify.css";
-import ImageGallery from "./ImageGallery";
-import Modal from "./Modal";
-
 import fetchPix from "./js/Api";
-import Button from "./Button";
+
+import Searchbar from "./Comps/Searchbar"; // import "react-toastify/dist/ReactToastify.css";
+import ImageGallery from "./Comps/ImageGallery";
+import Modal from "./Comps/Modal";
+
+import Button from "./Comps/Button";
 
 export default class App extends Component {
   state = {
@@ -17,12 +18,9 @@ export default class App extends Component {
     status: false,
   };
 
-  handleSubmit = async (query) => await this.setState({ query, curPage: 1 });
-
+  handleSubmit = (query) => this.setState({ query, curPage: 1 });
   toggleModal = () => this.setState({ showM: !this.state.showM });
-
-  handleMore = async () =>
-    await this.setState(({ curPage }) => ({ curPage: curPage + 1 }));
+  handleMore = () => this.setState(({ curPage }) => ({ curPage: curPage + 1 }));
 
   handleTakeID = (e) => {
     this.setState({ modalImgId: +e.target.id });
@@ -31,7 +29,7 @@ export default class App extends Component {
 
   async componentDidUpdate(_, pState) {
     const { state } = this;
-    const { query, curPage } = state;
+    const { query, curPage, imgs } = state;
 
     if (pState.query !== query) {
       this.setState({
@@ -44,7 +42,7 @@ export default class App extends Component {
     if (pState.curPage !== curPage) {
       this.setState({
         status: true,
-        imgs: [...(await fetchPix(query, curPage))],
+        imgs: [...imgs, ...(await fetchPix(query, curPage))],
       });
       this.setState({ status: false });
     }

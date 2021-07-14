@@ -1,4 +1,5 @@
 import { Component } from "react";
+import PropTypes from "prop-types";
 
 export default class Modal extends Component {
   componentDidMount() {
@@ -22,4 +23,9 @@ export default class Modal extends Component {
       </div>
     );
   }
-} // https://basiclightbox.electerious.com/
+}
+
+Modal.propTypes = {
+  urlBigImg: PropTypes.string.isRequired,
+  onClose: PropTypes.func.isRequired,
+}; // https://basiclightbox.electerious.com/

@@ -1,4 +1,5 @@
-// import Modal from "./Modal";
+import PropTypes from "prop-types";
+
 export default function ImageGalleryItem({ id, url, clickOnImg }) {
   return (
     <img
@@ -6,11 +7,13 @@ export default function ImageGalleryItem({ id, url, clickOnImg }) {
       id={id}
       src={url}
       alt="img"
-      // onClick={e => {
-      //   console.log(e.target.id);
-      //   <Modal id={e.target.id} />;
-      // }}
       onClick={clickOnImg}
     ></img>
   );
-} // <li className="ImageGalleryItem" key={img.id}></li>
+}
+
+ImageGalleryItem.propTypes = {
+  id: PropTypes.number.isRequired,
+  url: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired,
+};

@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 export default function Searchbar({ onSubmitDo }) {
   return (
     <>
@@ -26,3 +28,7 @@ export default function Searchbar({ onSubmitDo }) {
     </>
   );
 }
+
+Searchbar.propTypes = {
+  onSubmitDo: PropTypes.func.isRequired,
+};
